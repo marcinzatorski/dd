@@ -11,8 +11,10 @@ odkrycia:
 wydarzenia:
   - src/content/wydarzenia/2026-11-16-testowe-wydarzenie-kroniki.md
 ---
-Czwarty akapit dopisany podczas edycji.Pierwszy akapit testowej opowieści. Krasnoludy ruszyły w drogę, a mgła snuła się nisko nad Rudymi Wzgórzami.
+Pierwszy akapit testowej opowieści. Krasnoludy ruszyły w drogę, a mgła snuła się nisko nad Rudymi Wzgórzami.
 
 Drugi akapit — z *kursywą* i **pogrubieniem**. Amboß, Karvuß i Gooryg naradzali się przy ognisku.
 
 Trzeci akapit kończy próbę pióra.
+
+Czwarty akapit dopisany podczas edycji.
