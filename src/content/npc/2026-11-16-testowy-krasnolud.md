@@ -1,7 +1,8 @@
 ---
 id: npc-test
-imie: Testowy Krasnolud
-opis: Wpis testowy CMS. Zostanie usunięty po testach.
-portret: /media/npc/test-portret-a.webp
+imie: Testowy Krasnolud (edytowany)
+tytul: Kowal testowy
+opis: Wpis testowy CMS po edycji. Zostanie usunięty po testach.
+portret: /media/npc/test-portret-b.webp
 status: nieznany
 ---
