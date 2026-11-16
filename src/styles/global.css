@@ -328,9 +328,65 @@ a:hover > .zoom-hint, a:focus-visible > .zoom-hint { opacity: 1; }
 
 .site-footer { text-align: center; color: var(--muted); font-size: 15px; padding: 6px 20px 20px; letter-spacing: .04em; }
 
+
+/* ---------- Tryb kompaktowy: typowe ekrany 1920x1080 / laptopy ze skalowaniem ---------- */
+@media (max-height: 1000px), (max-width: 1700px) {
+  body { font-size: 17px; }
+  .site-header { min-height: 0; padding: 10px clamp(150px, 22vw, 420px) 12px; }
+  .logo { width: auto; height: clamp(64px, 11.5vh, 124px); max-width: 100%; }
+  .subtitle { font-size: clamp(17px, 2.9vh, 28px); margin-top: 2px; gap: 16px; }
+  .tagline { font-size: clamp(14px, 2.1vh, 20px); margin-top: 1px; }
+  .layout { grid-template-columns: minmax(240px, 23%) minmax(0, 1fr); gap: 12px; padding: 0 12px 12px; }
+  .sidebar .panel { padding: 16px 12px 10px 14px; }
+  .nav-h { font-size: 21px; margin-bottom: 6px; padding-bottom: 6px; gap: 10px; }
+  .nav-h .icon { width: 24px; height: 24px; }
+  .nav-item { font-size: clamp(15px, 0.9vw, 17px); padding: 6px 10px 6px 12px; margin: 2px 0; gap: 10px; }
+  .nav-item.world { font-size: clamp(16px, 0.95vw, 18px); padding-top: 5px; padding-bottom: 5px; }
+  .divider { margin: 12px 6px; }
+  .main-panel { padding: 20px clamp(18px, 2.4vw, 40px) 28px; }
+  .ep-head { margin-bottom: 14px; padding-bottom: 6px; }
+  .ep-head h1, .page-head h1 { font-size: clamp(26px, 4.4vh, 38px); padding: 0 110px; }
+  .page-head h1 { padding: 0; }
+  .page-head { margin-bottom: 18px; }
+  .ep-orn { width: 96px; }
+  .tabs [role='tab'] { min-width: 150px; padding: 7px 18px; font-size: 16.5px; }
+  .tabpanel { padding-top: 20px; }
+  .prose { font-size: 18px; line-height: 1.68; }
+  .story.has-ill .ep-ill { width: 42%; margin-left: 26px; }
+  .story-text > p:first-child::first-letter { font-size: 3.6em; }
+  .related h2 { font-size: 24px; margin: 12px 0 10px; }
+  .orn-rule { margin: 16px auto; }
+  .welcome h1 { font-size: clamp(30px, 5vh, 42px); margin-top: 4px; }
+  .welcome-intro { font-size: 18px; margin-bottom: 18px; }
+  .stoneframe { max-width: min(340px, 42vh); }
+  .welcome-caption { margin: 12px 0 14px; }
+  .cards { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
+  .cards-wide { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+  .cards-heroes { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+  .card-title { font-size: 21px; }
+  .card-sub, .card-text { font-size: 15px; }
+  .card-body { padding: 10px 12px 12px; }
+  .detail { width: 920px; }
+  .detail-grid { padding: 26px; gap: 24px; }
+  .detail-text h2 { font-size: 32px; }
+  .detail .prose { font-size: 16.5px; }
+  .detail-img img { max-height: 70vh; }
+  .tl-h { font-size: 26px; margin-bottom: 12px; }
+  .ev { padding-bottom: 12px; }
+  .ev-btn { padding: 6px 14px; }
+  .ev-title { font-size: 20px; }
+  .zero-btn { padding: 14px 20px; }
+  .zero-title { font-size: 30px; }
+  .zero-sub { font-size: 17px; }
+  .tl-zero { margin: 14px 0 20px; }
+  .map img { max-height: calc(100vh - 140px); object-fit: contain; }
+}
+@media (max-height: 800px) {
+  .side-gory { display: none; }
+}
+
 /* ---------- Responsywność ---------- */
 @media (max-width: 1280px) {
-  .site-header { min-height: 200px; }
   .ep-head h1 { padding: 0 100px; }
   .ep-orn { width: 90px; }
 }
