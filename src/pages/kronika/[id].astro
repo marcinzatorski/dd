@@ -3,11 +3,11 @@ import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Entity from '../../components/Entity.astro';
 import Icon from '../../components/Icon.astro';
-import { loadAll, img, imgW, epLabel, epUrl, url, eraLabel, parseDate, MONTHS, paragraphs } from '../../lib/data';
+import { loadAll, img, imgW, epLabel, epUrl, epSlug, url, eraLabel, parseDate, MONTHS, paragraphs } from '../../lib/data';
 
 export async function getStaticPaths() {
   const { epizody } = await loadAll();
-  return epizody.map((e) => ({ params: { id: e.id }, props: { id: e.id } }));
+  return epizody.map((e) => ({ params: { id: epSlug(e) }, props: { id: e.id } }));
 }
 const { epizody, rel } = await loadAll();
 const idx = epizody.findIndex((e) => e.id === Astro.props.id);

@@ -54,7 +54,8 @@ Wszystkie wpisy to pliki Markdown z nagłówkiem YAML (`format: yaml-frontmatter
 
 Uwagi:
 - `id` to stały identyfikator z arkusza początkowego (np. `npc-012`). Nowe wpisy: nadawaj kolejne numery.
-- Epizod pojawia się w menu KRONIKA, gdy plik istnieje. Kolejność = pole `kolejnosc`.
+- Epizod pojawia się w menu KRONIKA, gdy plik istnieje. Kolejność = pole `kolejnosc`. Adres strony epizodu = pole `id` (np. `/dd/kronika/ep-003/`); gdy puste lub zdublowane — nazwa pliku.
+- Pages CMS nadaje nowym plikom nazwy w formacie `RRRR-MM-DD-tytul.md` — to normalne; identyfikację zapewnia pole `id`.
 - Status „Nie żyje” → portret wyświetlany w sepii (filtr CSS; oryginał bez zmian).
 - Ilustracja epizodu dostaje „malarską” maskę krawędzi automatycznie (CSS `mask-image`, klasa `.painterly` w `src/styles/global.css`).
 
@@ -122,6 +123,7 @@ Ręczna publikacja: GitHub → Actions → „Publikacja strony” → **Run wor
 | Zapisałem, a na stronie nic się nie zmieniło | Odczekaj 3 min i odśwież stronę z pominięciem pamięci (Ctrl+F5). Sprawdź zakładkę Actions — jeśli czerwony krzyżyk, otwórz log; najczęściej błąd danych (np. puste wymagane pole, zła data). Popraw wpis w CMS i zapisz ponownie. |
 | Obraz się nie wyświetla | Sprawdź, czy w polu wybrano plik z biblioteki (ścieżka zaczyna się od `/media/`). Nazwy plików najlepiej bez spacji i polskich znaków (CMS zamienia je automatycznie). |
 | Epizod nie pojawia się w menu | Sprawdź, czy wpis jest zapisany i ma `kolejnosc`; po publikacji odśwież stronę. |
+| Wybrane powiązanie „zniknęło” po zapisie | Wybór zrobiony tuż po otwarciu formularza mógł zostać nadpisany przez jego wczytywanie. Otwórz epizod, odczekaj chwilę, wybierz ponownie i zapisz. |
 | NPC/miejsce nie pokazuje się w epizodzie | Przypisz je w **epizodzie** (pola „NPC w epizodzie” / „Miejsca w epizodzie”), nie w karcie NPC. |
 | Oś czasu w złej kolejności | Sprawdź pełną datę i erę wydarzenia; „Klątwa i Krąg” musi mieć zaznaczone „Wydarzenie zerowe” (tylko jedno wydarzenie). |
 | Workflow: błąd „Pages not enabled” | Settings → Pages → Source: GitHub Actions. |

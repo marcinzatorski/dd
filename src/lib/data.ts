@@ -71,6 +71,13 @@ async function build() {
     getCollection('miejsca'), getCollection('odkrycia'), getCollection('wydarzenia'),
   ]);
   epizody.sort((a, b) => a.data.kolejnosc - b.data.kolejnosc || a.id.localeCompare(b.id));
+  const used = new Set<string>();
+  for (const e of epizody) {
+    let s = (e.data.id || '').toLowerCase().trim().replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '');
+    if (!s || used.has(s)) s = e.id;
+    used.add(s);
+    slugCache.set(e, s);
+  }
   bohaterowie.sort((a, b) => a.data.kolejnosc - b.data.kolejnosc || a.data.imie.localeCompare(b.data.imie, 'pl'));
   const byName = (k: string) => (a: any, b: any) => String(a.data[k]).localeCompare(String(b.data[k]), 'pl');
   npc.sort(byName('imie')); miejsca.sort(byName('nazwa')); odkrycia.sort(byName('nazwa'));
@@ -109,7 +116,12 @@ export function parseDate(d: string) {
   return { y, m, day };
 }
 export const epLabel = (e: Ep) => [e.data.oznaczenie, e.data.tytul].filter(Boolean).join(' — ');
-export const epUrl = (e: Ep) => url(`kronika/${e.id}/`);
+/** Adres epizodu: z pola „Identyfikator” (np. ep-003), a gdy puste lub zdublowane — z nazwy pliku. */
+const slugCache = new WeakMap<object, string>();
+export function epSlug(e: Ep): string {
+  return slugCache.get(e) ?? e.id;
+}
+export const epUrl = (e: Ep) => url(`kronika/${epSlug(e)}/`);
 export const paragraphs = (t: string) => (t || '').split(/\n\s*\n/).map((s) => s.trim()).filter(Boolean);
 
 export const STATUS: Record<string, string> = { zyje: 'Żyje', 'nie-zyje': 'Nie żyje', nieznany: 'Los nieznany' };

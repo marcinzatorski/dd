@@ -14,7 +14,7 @@ Na samej stronie kroniki nie ma żadnego przycisku do CMS — to celowe.
 
 1. **Kronika — epizody → Add an entry** (Dodaj wpis).
 2. Wypełnij:
-   - **Identyfikator** — np. `ep-003` (małe litery, cyfry, łącznik; potem go nie zmieniaj),
+   - **Identyfikator** — np. `ep-003` (małe litery, cyfry, łącznik; potem go nie zmieniaj — z niego powstaje adres strony epizodu, np. `/dd/kronika/ep-003/`),
    - **Kolejność w kronice** — np. `3`,
    - **Oznaczenie** — np. `Epizod III`,
    - **Tytuł** — np. `Cień nad Ostrowinem`.
@@ -49,6 +49,8 @@ Powiązania ustawia się **tylko w epizodzie**:
 2. W polach **NPC w epizodzie**, **Miejsca w epizodzie**, **Odkrycia w epizodzie**, **Kluczowe wydarzenia w epizodzie** zacznij pisać nazwę i wybierz wpis z listy (można wybrać wiele).
 3. Aby usunąć powiązanie — kliknij ✕ przy nazwie.
 4. **Save**.
+
+**Ważne:** po otwarciu epizodu odczekaj 2–3 sekundy, aż formularz w pełni się wczyta, zanim zaczniesz wybierać powiązania (wybór zrobiony w pierwszej chwili może zostać nadpisany przez wczytujący się formularz). Po zapisie upewnij się, że wybrane nazwy nadal są widoczne w polach.
 
 Strona sama doda np. na karcie NPC informację „Pojawia się w kronice: Epizod II”. Najpierw musi istnieć wpis (np. nowy NPC) — dopiero wtedy da się go wybrać w epizodzie.
 
