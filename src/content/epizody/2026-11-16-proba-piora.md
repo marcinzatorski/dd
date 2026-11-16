@@ -4,6 +4,8 @@ kolejnosc: 99
 oznaczenie: Epizod testowy
 tytul: Próba pióra
 ilustracja: /media/epizody/test-ilustracja.webp
+npc:
+  - src/content/npc/npc-003.md
 miejsca:
   - src/content/miejsca/miejsce-001.md
 odkrycia:
