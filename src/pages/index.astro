@@ -1,0 +1,19 @@
+---
+import Base from '../layouts/Base.astro';
+import { loadAll, epUrl, url } from '../lib/data';
+const { epizody } = await loadAll();
+const first = epizody[0];
+---
+<Base>
+  <section class="welcome">
+    <h1>Kronika naszych przygód</h1>
+    <div class="orn-rule" aria-hidden="true"><span>❖</span></div>
+    <p class="welcome-intro">Wśród Rudych Wzgórz, na pograniczu znanych krain, zapisują się losy trzech wędrowców. Oto opowieści o odkryciach, dawnych tajemnicach i przygodach, które jeszcze nie dobiegły końca.</p>
+    <figure class="stoneframe">
+      <img src={url('assets/herb.jpg')} alt="Kamienny herb rodu: młot nad kowadłem i dwa topory po bokach" width="900" height="750" />
+    </figure>
+    <p class="welcome-caption">Zapiski z Cieni Rudych Wzgórz</p>
+    {first && <a class="btn" href={epUrl(first)}>Otwórz kronikę <span aria-hidden="true">❯</span></a>}
+    <div class="orn-rule small" aria-hidden="true"><span>❖</span></div>
+  </section>
+</Base>

@@ -1,0 +1,86 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Entity from '../../components/Entity.astro';
+import Icon from '../../components/Icon.astro';
+import { loadAll, img, imgW, epLabel, epUrl, url, eraLabel, parseDate, MONTHS, paragraphs } from '../../lib/data';
+
+export async function getStaticPaths() {
+  const { epizody } = await loadAll();
+  return epizody.map((e) => ({ params: { id: e.id }, props: { id: e.id } }));
+}
+const { epizody, rel } = await loadAll();
+const idx = epizody.findIndex((e) => e.id === Astro.props.id);
+const ep = epizody[idx];
+const r = rel(ep);
+const { Content } = await render(ep);
+const prev = epizody[idx - 1], next = epizody[idx + 1];
+const ill = ep.data.ilustracja;
+const title = epLabel(ep);
+const evDate = (d: string) => { const { y, m } = parseDate(d); return `${MONTHS[m - 1] ?? ''} ${y}`; };
+---
+<Base title={title} current={'ep:' + ep.id}>
+  <article class="episode">
+    <header class="ep-head">
+      <img class="ep-orn" src={url('assets/ornament-gora.webp')} alt="" aria-hidden="true" width="144" height="56" />
+      <h1>{title}</h1>
+    </header>
+
+    <div class="tabs" role="tablist" aria-label="Sekcje epizodu">
+      <button role="tab" id="t-opowiesc" data-tab="opowiesc" aria-controls="p-opowiesc" aria-selected="true"><Icon name="book" /> Opowieść</button>
+      <button role="tab" id="t-postacie" data-tab="postacie" aria-controls="p-postacie" aria-selected="false" tabindex="-1"><Icon name="users" /> Postacie</button>
+      <button role="tab" id="t-miejsca" data-tab="miejsca" aria-controls="p-miejsca" aria-selected="false" tabindex="-1"><Icon name="pin" /> Miejsca</button>
+    </div>
+
+    <section id="p-opowiesc" role="tabpanel" aria-labelledby="t-opowiesc" class="tabpanel">
+      <div class:list={['story', { 'has-ill': !!ill }]}>
+        {ill && (
+          <figure class="ep-ill">
+            <a href={img(ill)} data-zoom={imgW(ill, 1600)} data-orig={img(ill)} data-caption={title} title="Powiększ ilustrację">
+              <img class="painterly" src={imgW(ill, 1600)} data-orig={img(ill)} alt={`Ilustracja do: ${title}`} decoding="async" />
+            </a>
+          </figure>
+        )}
+        <div class="prose story-text"><Content /></div>
+      </div>
+
+      {(r.odkrycia.length > 0 || r.wydarzenia.length > 0) && <div class="orn-rule" aria-hidden="true"><span>❖</span></div>}
+      {r.odkrycia.length > 0 && (
+        <section class="related">
+          <h2><Icon name="chest" /> Odkrycia</h2>
+          <div class="cards cards-small">{r.odkrycia.map((o) => <Entity kind="odkrycie" entry={o} />)}</div>
+        </section>
+      )}
+      {r.wydarzenia.length > 0 && (
+        <section class="related">
+          <h2><Icon name="scroll" /> Kluczowe wydarzenia</h2>
+          <ul class="ev-mini">
+            {r.wydarzenia.map((w) => (
+              <li>
+                <a href={url(`swiat/wydarzenia/#${w.id}`)}>
+                  <span class="ev-date">{evDate(w.data.data)} · {eraLabel(w.data.era)}</span>
+                  <strong>{w.data.tytul}</strong>
+                </a>
+                {w.data.opis && <p>{paragraphs(w.data.opis)[0]}</p>}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </section>
+
+    <section id="p-postacie" role="tabpanel" aria-labelledby="t-postacie" class="tabpanel" hidden>
+      {r.npc.length ? <div class="cards">{r.npc.map((n) => <Entity kind="npc" entry={n} />)}</div>
+        : <p class="empty">W tym epizodzie nie przypisano postaci.</p>}
+    </section>
+    <section id="p-miejsca" role="tabpanel" aria-labelledby="t-miejsca" class="tabpanel" hidden>
+      {r.miejsca.length ? <div class="cards cards-wide">{r.miejsca.map((m) => <Entity kind="miejsce" entry={m} />)}</div>
+        : <p class="empty">W tym epizodzie nie przypisano miejsc.</p>}
+    </section>
+
+    <nav class="ep-nav" aria-label="Sąsiednie epizody">
+      {prev ? <a href={epUrl(prev)} rel="prev">← {epLabel(prev)}</a> : <span></span>}
+      {next ? <a href={epUrl(next)} rel="next">{epLabel(next)} →</a> : <span></span>}
+    </nav>
+  </article>
+</Base>

@@ -1,0 +1,203 @@
+---
+import '../styles/global.css';
+import Icon from '../components/Icon.astro';
+import { loadAll, url, epUrl, epLabel } from '../lib/data';
+
+interface Props { title?: string; current?: string; description?: string }
+const { title, current = '', description = 'Ilustrowana kronika kampanii Dungeons and Dwarves — Cienie Rudych Wzgórz. Przygody Amboßa, Karvußa i Gooryga.' } = Astro.props;
+const { epizody } = await loadAll();
+const fullTitle = title ? `${title} · Dungeons and Dwarves` : 'Dungeons and Dwarves — Cienie Rudych Wzgórz';
+const world = [
+  { key: 'bohaterowie', label: 'Bohaterowie', icon: 'users' },
+  { key: 'npc', label: 'NPC', icon: 'user' },
+  { key: 'miejsca', label: 'Miejsca', icon: 'pin' },
+  { key: 'odkrycia', label: 'Odkrycia', icon: 'chest' },
+  { key: 'wydarzenia', label: 'Kluczowe wydarzenia', icon: 'scroll' },
+];
+const a = (p: string) => url('assets/' + p);
+---
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/png" href={a('favicon.png')} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL(a('herb.jpg'), Astro.site).href} />
+    <style set:html={`:root{--tex:url(${a('pergamin.jpg')})}`}></style>
+  </head>
+  <body>
+    <a class="skip" href="#tresc">Przejdź do treści</a>
+    <div class="page">
+      <header class="site-header">
+        <img class="hdr-gory" src={a('header-gory.webp')} alt="" aria-hidden="true" width="405" height="232" />
+        <img class="hdr-herb" src={a('herb-naglowek.webp')} alt="" aria-hidden="true" width="520" height="433" />
+        <a class="brand" href={url()} aria-label="Dungeons and Dwarves — strona główna">
+          <img class="logo" src={a('logo.webp')} alt="Dungeons and Dwarves" width="1400" height="331" />
+        </a>
+        <p class="subtitle"><span class="rule" aria-hidden="true"></span>Cienie Rudych Wzgórz<span class="rule" aria-hidden="true"></span></p>
+        <p class="tagline">Przygody Amboßa, Karvußa i Gooryga</p>
+        <button class="menu-btn" type="button" aria-controls="nawigacja" aria-expanded="false">
+          <Icon name="menu" /> <span>Menu</span>
+        </button>
+      </header>
+
+      <div class="layout">
+        <aside id="nawigacja" class="sidebar" aria-label="Nawigacja główna">
+          <div class="panel">
+            <section class="nav-kronika">
+              <h2 class="nav-h"><Icon name="book" size={30} /> Kronika</h2>
+              <nav class="kronika-list" aria-label="Epizody kroniki">
+                <ul>
+                  {epizody.map((e, i) => {
+                    const on = current === 'ep:' + e.id;
+                    return (
+                      <li>
+                        <a href={epUrl(e)} class:list={['nav-item', { active: on }]} aria-current={on ? 'page' : undefined}>
+                          <Icon name={i === 0 && /prolog/i.test(e.data.oznaczenie) ? 'feather' : 'mountain'} size={20} />
+                          <span>{epLabel(e)}</span>
+                        </a>
+                      </li>
+                    );
+                  })}
+                  {epizody.length === 0 && <li class="empty">Kronika czeka na pierwszy wpis.</li>}
+                </ul>
+              </nav>
+            </section>
+            <div class="divider" aria-hidden="true"><span>❖</span></div>
+            <section class="nav-swiat">
+              <h2 class="nav-h">
+                <a href={url('swiat/')} class:list={['swiat-link', { active: current === 'swiat' }]} aria-current={current === 'swiat' ? 'page' : undefined} title="Mapa znanego świata">
+                  <Icon name="compass" size={30} /> Świat
+                </a>
+              </h2>
+              <nav aria-label="Świat kampanii">
+                <ul>
+                  {world.map((w) => (
+                    <li>
+                      <a href={url(`swiat/${w.key}/`)} class:list={['nav-item', 'world', { active: current === w.key }]} aria-current={current === w.key ? 'page' : undefined}>
+                        <Icon name={w.icon} size={22} /> <span>{w.label}</span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            </section>
+            <div class="divider" aria-hidden="true"><span>❖</span></div>
+            <img class="side-gory" src={a('sidebar-gory.webp')} alt="" aria-hidden="true" width="365" height="95" />
+          </div>
+        </aside>
+
+        <main id="tresc" class="content" tabindex="-1">
+          <div class="panel main-panel">
+            <slot />
+          </div>
+        </main>
+      </div>
+      <footer class="site-footer">Dungeons and Dwarves · Cienie Rudych Wzgórz · Kronika przygód</footer>
+    </div>
+
+    <dialog class="lightbox" id="lightbox" aria-label="Powiększenie obrazu">
+      <button class="dlg-close" type="button" data-close aria-label="Zamknij"><Icon name="close" /></button>
+      <img alt="" />
+      <p class="lb-caption"></p>
+    </dialog>
+
+    <script>
+      // --- Okna dialogowe (karty postaci, miejsc, odkryć) ---
+      const open = (d: HTMLDialogElement) => { d.showModal(); document.body.classList.add('modal-open'); };
+      document.addEventListener('click', (ev) => {
+        const t = ev.target as HTMLElement;
+        const opener = t.closest<HTMLElement>('[data-open]');
+        if (opener) {
+          const d = document.getElementById(opener.dataset.open!) as HTMLDialogElement | null;
+          if (d) { ev.preventDefault(); open(d); }
+          return;
+        }
+        const zoom = t.closest<HTMLElement>('[data-zoom]');
+        if (zoom) {
+          ev.preventDefault();
+          const lb = document.getElementById('lightbox') as HTMLDialogElement;
+          const im = lb.querySelector('img')!;
+          im.src = zoom.dataset.zoom!;
+          im.dataset.orig = zoom.dataset.orig || '';
+          im.alt = zoom.dataset.caption || '';
+          lb.querySelector('.lb-caption')!.textContent = zoom.dataset.caption || '';
+          open(lb);
+          return;
+        }
+        if (t.closest('[data-close]')) { t.closest('dialog')?.close(); return; }
+        // klik w tło okna zamyka je
+        if (t.tagName === 'DIALOG') (t as HTMLDialogElement).close();
+      });
+      document.querySelectorAll('dialog').forEach((d) =>
+        d.addEventListener('close', () => {
+          if (!document.querySelector('dialog[open]')) document.body.classList.remove('modal-open');
+        })
+      );
+
+      // --- Brakująca wersja zoptymalizowana -> oryginał ---
+      document.addEventListener('error', (ev) => {
+        const im = ev.target as HTMLImageElement;
+        if (im.tagName === 'IMG' && im.dataset.orig && im.src !== new URL(im.dataset.orig, location.href).href) {
+          im.src = im.dataset.orig;
+        }
+      }, true);
+
+      // --- Menu mobilne ---
+      const btn = document.querySelector<HTMLButtonElement>('.menu-btn')!;
+      btn.addEventListener('click', () => {
+        const on = document.body.classList.toggle('nav-open');
+        btn.setAttribute('aria-expanded', String(on));
+      });
+
+      // --- Zakładki epizodu ---
+      const tabs = [...document.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+      const show = (id: string, focus = false, push = true) => {
+        const tab = tabs.find((x) => x.dataset.tab === id) ?? tabs[0];
+        if (!tab) return;
+        tabs.forEach((x) => {
+          const on = x === tab;
+          x.setAttribute('aria-selected', String(on));
+          x.tabIndex = on ? 0 : -1;
+          document.getElementById(x.getAttribute('aria-controls')!)!.hidden = !on;
+        });
+        if (focus) tab.focus();
+        if (push) history.replaceState(null, '', tab.dataset.tab === 'opowiesc' ? location.pathname : '#' + tab.dataset.tab);
+      };
+      tabs.forEach((x, i) => {
+        x.addEventListener('click', () => show(x.dataset.tab!));
+        x.addEventListener('keydown', (e) => {
+          const k = e.key;
+          const n = k === 'ArrowRight' ? i + 1 : k === 'ArrowLeft' ? i - 1 : k === 'Home' ? 0 : k === 'End' ? tabs.length - 1 : null;
+          if (n === null) return;
+          e.preventDefault();
+          show(tabs[(n + tabs.length) % tabs.length].dataset.tab!, true);
+        });
+      });
+      if (tabs.length && location.hash) show(location.hash.slice(1), false, false);
+
+      // --- Oś czasu: dotyk / klawiatura otwiera panel ---
+      document.querySelectorAll<HTMLButtonElement>('.ev-btn').forEach((b) => {
+        b.addEventListener('click', () => {
+          const li = b.closest('.ev')!;
+          const on = !li.classList.contains('open');
+          document.querySelectorAll('.ev.open').forEach((x) => { x.classList.remove('open'); x.querySelector('.ev-btn')?.setAttribute('aria-expanded', 'false'); });
+          li.classList.toggle('open', on);
+          b.setAttribute('aria-expanded', String(on));
+        });
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') document.querySelectorAll('.ev.open').forEach((x) => x.classList.remove('open'));
+      });
+      const target = location.hash ? document.getElementById(decodeURIComponent(location.hash.slice(1))) : null;
+      if (target?.classList.contains('ev')) {
+        target.querySelector<HTMLButtonElement>('.ev-btn')?.click();
+        target.scrollIntoView({ block: 'center' });
+      }
+    </script>
+  </body>
+</html>

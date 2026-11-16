@@ -1,0 +1,85 @@
+---
+// Karta (miniatura) + okno szczegółów dla bohatera, NPC, miejsca lub odkrycia.
+import { render } from 'astro:content';
+import Icon from './Icon.astro';
+import { img, imgW, loadAll, epUrl, epLabel, STATUS, paragraphs } from '../lib/data';
+
+interface Props { kind: 'bohater' | 'npc' | 'miejsce' | 'odkrycie'; entry: any; prefix?: string }
+const { kind, entry, prefix = '' } = Astro.props;
+const { episodesOf } = await loadAll();
+const d = entry.data;
+const dlgId = `${prefix}${kind}-${entry.id}`.replace(/[^a-zA-Z0-9_-]/g, '-');
+const name: string = d.imie ?? d.nazwa;
+const image: string = d.portret || d.ilustracja || '';
+const deceased = kind === 'npc' && d.status === 'nie-zyje';
+const portrait = kind === 'bohater' || kind === 'npc';
+
+let sub = '';
+let short = '';
+if (kind === 'bohater') {
+  sub = [d.przydomek && `„${d.przydomek}”`, d.rod && `ród ${d.rod}`, d.klan && `klan ${d.klan}`].filter(Boolean).join(' · ');
+  short = d.krotki_opis;
+} else if (kind === 'npc') {
+  sub = d.tytul; short = d.opis;
+} else if (kind === 'miejsce') {
+  sub = d.region;
+} else {
+  sub = d.typ; short = d.opis;
+}
+const hasBody = kind === 'bohater' || kind === 'miejsce';
+const { Content } = hasBody ? await render(entry) : { Content: null };
+const episodes = kind === 'bohater' ? [] : episodesOf(entry);
+const fullName = kind === 'bohater' ? [d.imie, d.nazwisko].filter(Boolean).join(' ') : name;
+// skrót opisu miejsca do karty
+const teaser = kind === 'miejsce' ? (entry.body || '').replace(/[#*_>`\[\]]/g, '').split(/\n\s*\n/)[0]?.trim() ?? '' : short;
+---
+<article class:list={['card', `card-${kind}`, { deceased }]}>
+  <button type="button" class="card-btn" data-open={dlgId} aria-haspopup="dialog">
+    <span class:list={['card-img', portrait ? 'portrait' : 'landscape']}>
+      {image ? <img src={imgW(image)} data-orig={img(image)} alt="" loading="lazy" decoding="async" /> : <span class="noimg" aria-hidden="true">❖</span>}
+    </span>
+    <span class="card-body">
+      <span class="card-title">{fullName}</span>
+      {sub && <span class="card-sub">{sub}</span>}
+      {kind === 'npc' && d.status !== 'zyje' && <span class:list={['badge', d.status]}>{STATUS[d.status] ?? ''}</span>}
+      {teaser && <span class="card-text">{teaser}</span>}
+    </span>
+  </button>
+</article>
+
+<dialog class:list={['detail', `detail-${kind}`, { deceased }]} id={dlgId} aria-labelledby={dlgId + '-t'}>
+  <button class="dlg-close" type="button" data-close aria-label="Zamknij"><Icon name="close" /></button>
+  <div class="detail-grid">
+    {image && (
+      <figure class:list={['detail-img', portrait ? 'portrait' : 'landscape']}>
+        <a href={img(image)} data-zoom={imgW(image, 1600)} data-orig={img(image)} data-caption={fullName} title="Powiększ">
+          <img src={imgW(image, 1600)} data-orig={img(image)} alt={`Ilustracja: ${fullName}`} loading="lazy" decoding="async" />
+          <span class="zoom-hint"><Icon name="zoom" size={18} /> Powiększ</span>
+        </a>
+      </figure>
+    )}
+    <div class="detail-text">
+      <h2 id={dlgId + '-t'}>{fullName}</h2>
+      {sub && <p class="detail-sub">{sub}</p>}
+      {kind === 'npc' && <p class:list={['status', d.status]}>Status: {STATUS[d.status] ?? 'Los nieznany'}</p>}
+      {kind === 'bohater' && d.krotki_opis && <p class="lead">{d.krotki_opis}</p>}
+      {!hasBody && paragraphs(short).map((p) => <p>{p}</p>)}
+      {Content && <div class="prose"><Content /></div>}
+      {kind === 'miejsce' && d.galeria?.length > 0 && (
+        <div class="gallery">
+          {d.galeria.map((g: string, i: number) => (
+            <a href={img(g)} data-zoom={imgW(g, 1600)} data-orig={img(g)} data-caption={`${fullName} — ilustracja ${i + 2}`}>
+              <img src={imgW(g)} data-orig={img(g)} alt={`${fullName} — ilustracja ${i + 2}`} loading="lazy" />
+            </a>
+          ))}
+        </div>
+      )}
+      {episodes.length > 0 && (
+        <p class="appears">
+          <strong>Pojawia się w kronice:</strong>{' '}
+          {episodes.map((e, i) => <>{i > 0 && ', '}<a href={epUrl(e)}>{epLabel(e)}</a></>)}
+        </p>
+      )}
+    </div>
+  </div>
+</dialog>

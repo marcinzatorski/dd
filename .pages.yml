@@ -1,0 +1,277 @@
+# Konfiguracja Pages CMS — https://app.pagescms.org/
+# Dokumentacja: https://pagescms.org/docs/
+# Wszystkie treści zapisywane są jako pliki w tym repozytorium (gałąź main).
+# Każdy zapis w CMS = commit = automatyczna publikacja strony (GitHub Actions).
+
+media:
+  input: public/media
+  output: /media
+  categories: [image]
+  rename: safe
+
+content:
+  # ---------------------------------------------------------------- KRONIKA
+  - name: epizody
+    label: Kronika — epizody
+    type: collection
+    path: src/content/epizody
+    format: yaml-frontmatter
+    view:
+      fields: [kolejnosc, oznaczenie, tytul]
+      primary: tytul
+      sort: [kolejnosc, tytul]
+      default:
+        sort: kolejnosc
+        order: asc
+    fields:
+      - name: id
+        label: Identyfikator
+        type: string
+        required: true
+        description: Stały identyfikator, np. ep-003 (małe litery, cyfry, łączniki). Nie zmieniaj po utworzeniu.
+        pattern:
+          regex: '^[a-z0-9-]+$'
+          message: Tylko małe litery, cyfry i łączniki.
+      - name: kolejnosc
+        label: Kolejność w kronice
+        type: number
+        required: true
+        description: "Numer porządkowy: Prolog = 0, Epizod I = 1, Epizod II = 2…"
+      - name: oznaczenie
+        label: Oznaczenie
+        type: string
+        required: true
+        description: Np. „Epizod III”.
+      - name: tytul
+        label: Tytuł
+        type: string
+        required: true
+      - name: ilustracja
+        label: Ilustracja główna (opcjonalna)
+        type: image
+        description: Strona sama doda miękką, „malarską” krawędź — wgraj zwykły obraz.
+        options:
+          path: public/media/epizody
+      - name: npc
+        label: NPC w epizodzie
+        type: reference
+        options:
+          collection: npc
+          multiple: true
+          search: imie
+          value: "{path}"
+          label: "{imie}"
+      - name: miejsca
+        label: Miejsca w epizodzie
+        type: reference
+        options:
+          collection: miejsca
+          multiple: true
+          search: nazwa
+          value: "{path}"
+          label: "{nazwa}"
+      - name: odkrycia
+        label: Odkrycia w epizodzie
+        type: reference
+        options:
+          collection: odkrycia
+          multiple: true
+          search: nazwa
+          value: "{path}"
+          label: "{nazwa}"
+      - name: wydarzenia
+        label: Kluczowe wydarzenia w epizodzie
+        type: reference
+        options:
+          collection: wydarzenia
+          multiple: true
+          search: tytul
+          value: "{path}"
+          label: "{tytul}"
+      - name: body
+        label: Opowieść
+        type: rich-text
+        description: Wklej całą opowieść Kronikarza (akapity zostaną zachowane).
+        options:
+          format: markdown
+          media: false
+
+  # ---------------------------------------------------------------- ŚWIAT
+  - name: bohaterowie
+    label: Bohaterowie
+    type: collection
+    path: src/content/bohaterowie
+    format: yaml-frontmatter
+    view:
+      fields: [imie, nazwisko, kolejnosc]
+      primary: imie
+      default:
+        sort: kolejnosc
+        order: asc
+    fields:
+      - { name: id, label: Identyfikator, type: string, required: true, description: "Np. boh-004." }
+      - { name: imie, label: Imię, type: string, required: true }
+      - { name: nazwisko, label: Nazwisko, type: string }
+      - { name: rod, label: Ród, type: string }
+      - { name: klan, label: Klan, type: string }
+      - { name: przydomek, label: Przydomek (opcjonalny), type: string }
+      - { name: kolejnosc, label: Kolejność na liście, type: number }
+      - name: portret
+        label: Portret
+        type: image
+        required: true
+        options:
+          path: public/media/bohaterowie
+      - { name: krotki_opis, label: Krótkie wprowadzenie, type: text, required: true }
+      - name: body
+        label: Biografia
+        type: rich-text
+        options:
+          format: markdown
+          media: false
+
+  - name: npc
+    label: NPC
+    type: collection
+    path: src/content/npc
+    format: yaml-frontmatter
+    view:
+      fields: [imie, status]
+      primary: imie
+      default:
+        sort: imie
+        order: asc
+    fields:
+      - { name: id, label: Identyfikator, type: string, required: true, description: "Np. npc-017." }
+      - { name: imie, label: Imię / nazwa, type: string, required: true }
+      - { name: tytul, label: Tytuł, przydomek lub funkcja (opcjonalnie), type: string }
+      - { name: opis, label: Krótki opis (kilka zdań), type: text, required: true }
+      - name: portret
+        label: Portret
+        type: image
+        required: true
+        description: Gdy wizerunek nie jest znany, wybierz z biblioteki plik placeholdery/wizerunek-nieznany.png.
+        options:
+          path: public/media/npc
+      - name: status
+        label: Status
+        type: select
+        default: nieznany
+        description: Dla „Nie żyje” portret na stronie pokaże się w sepii (oryginał bez zmian).
+        options:
+          values:
+            - { name: zyje, label: Żyje }
+            - { name: nie-zyje, label: Nie żyje }
+            - { name: nieznany, label: Los nieznany }
+
+  - name: miejsca
+    label: Miejsca
+    type: collection
+    path: src/content/miejsca
+    format: yaml-frontmatter
+    view:
+      fields: [nazwa, region]
+      primary: nazwa
+      default:
+        sort: nazwa
+        order: asc
+    fields:
+      - { name: id, label: Identyfikator, type: string, required: true, description: "Np. miejsce-010." }
+      - { name: nazwa, label: Nazwa, type: string, required: true }
+      - { name: region, label: Region (opcjonalnie), type: string }
+      - name: ilustracja
+        label: Ilustracja główna
+        type: image
+        required: true
+        description: Dla miejsc znanych tylko z opowieści wybierz placeholdery/miejsce-znane-z-opowiesci.png.
+        options:
+          path: public/media/miejsca
+      - name: galeria
+        label: Dodatkowe ilustracje (opcjonalnie)
+        type: image
+        options:
+          path: public/media/miejsca
+          multiple: true
+      - name: body
+        label: Opis
+        type: rich-text
+        options:
+          format: markdown
+          media: false
+
+  - name: odkrycia
+    label: Odkrycia
+    type: collection
+    path: src/content/odkrycia
+    format: yaml-frontmatter
+    view:
+      fields: [nazwa, typ]
+      primary: nazwa
+      default:
+        sort: nazwa
+        order: asc
+    fields:
+      - { name: id, label: Identyfikator, type: string, required: true, description: "Np. odk-006." }
+      - { name: nazwa, label: Nazwa, type: string, required: true }
+      - name: typ
+        label: Typ
+        type: select
+        required: true
+        options:
+          values: [Przedmiot, Artefakt, Dokument, Symbol, Inne]
+      - name: ilustracja
+        label: Ilustracja
+        type: image
+        required: true
+        options:
+          path: public/media/odkrycia
+      - { name: opis, label: Opis, type: text, required: true }
+
+  - name: wydarzenia
+    label: Kluczowe wydarzenia
+    type: collection
+    path: src/content/wydarzenia
+    format: yaml-frontmatter
+    view:
+      fields: [tytul, data, punkt_zerowy]
+      primary: tytul
+      default:
+        sort: data
+        order: asc
+    fields:
+      - { name: id, label: Identyfikator, type: string, required: true, description: "Np. wyd-008." }
+      - { name: tytul, label: Tytuł, type: string, required: true }
+      - { name: podtytul, label: Podtytuł (opcjonalnie), type: string }
+      - name: data
+        label: Pełna data (dzień, miesiąc, rok)
+        type: date
+        required: true
+        description: "Wymagana zawsze, nawet gdy na stronie widać tylko rok lub miesiąc i rok."
+      - name: era
+        label: Era
+        type: select
+        required: true
+        default: III
+        options:
+          values: [I, II, III, IV]
+      - { name: opis, label: Krótki opis (jeden akapit), type: text }
+      - name: punkt_zerowy
+        label: Wydarzenie zerowe (przybycie bohaterów)
+        type: boolean
+        default: false
+        description: Zaznacz tylko dla jednego wydarzenia („Klątwa i Krąg”). Oddziela Historię świata od Kroniki drużyny.
+
+  - name: swiat
+    label: Mapa świata
+    type: file
+    path: src/data/swiat.json
+    format: json
+    fields:
+      - { name: tytul, label: Tytuł strony mapy, type: string }
+      - name: mapa
+        label: Mapa
+        type: image
+        required: true
+        options:
+          path: public/media/swiat
+      - { name: podpis, label: Podpis pod mapą (opcjonalnie), type: string }

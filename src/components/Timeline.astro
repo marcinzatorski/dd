@@ -1,0 +1,69 @@
+---
+// Oś czasu: Historia świata | Wydarzenie zerowe | Kronika drużyny
+import { loadAll, eraLabel, parseDate, MONTHS, epUrl, epLabel, paragraphs, url } from '../lib/data';
+const { wydarzenia, episodesOf } = await loadAll();
+const zeroIdx = wydarzenia.findIndex((w) => w.data.punkt_zerowy);
+const history = zeroIdx >= 0 ? wydarzenia.slice(0, zeroIdx) : [];
+const zero = zeroIdx >= 0 ? wydarzenia[zeroIdx] : null;
+const chronicle = zeroIdx >= 0 ? wydarzenia.slice(zeroIdx + 1) : wydarzenia;
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+const fmt = (w: any, withMonth: boolean) => {
+  const { y, m } = parseDate(w.data.data);
+  return { main: withMonth && m ? `${cap(MONTHS[m - 1])} ${y}` : `Rok ${y}`, era: eraLabel(w.data.era) };
+};
+const sections = [
+  { key: 'historia', title: 'Historia świata', note: 'Czasy sprzed przybycia bohaterów', items: history, month: false },
+  { key: 'kronika', title: 'Kronika drużyny', note: 'Od przybycia bohaterów', items: chronicle, month: true },
+];
+---
+<div class="timeline">
+  {[sections[0], 'ZERO', sections[1]].map((s: any) => {
+    if (s === 'ZERO') {
+      if (!zero) return null;
+      const f = fmt(zero, true);
+      const eps = episodesOf(zero);
+      return (
+        <section class="tl-zero ev" id={zero.id}>
+          <div class="zero-ornament" aria-hidden="true">✦ ❖ ✦</div>
+          <button type="button" class="ev-btn zero-btn" aria-expanded="false" aria-controls={`p-${zero.id}`}>
+            <span class="ev-date">{f.main} · {f.era}</span>
+            <span class="zero-title">{zero.data.tytul}</span>
+            {zero.data.podtytul && <span class="zero-sub">{zero.data.podtytul}</span>}
+          </button>
+          <div class="ev-panel" id={`p-${zero.id}`} role="region" aria-label={zero.data.tytul}>
+            {paragraphs(zero.data.opis).map((p) => <p>{p}</p>)}
+            {eps.map((e) => <a class="ev-link" href={epUrl(e)}>→ {epLabel(e)}</a>)}
+          </div>
+        </section>
+      );
+    }
+    if (s.key === 'historia' && !zero) return null;
+    return (
+      <section class={`tl-sec tl-${s.key}`} aria-labelledby={`tl-${s.key}`}>
+        <h2 class="tl-h" id={`tl-${s.key}`}>{s.title}<small>{s.note}</small></h2>
+        {s.items.length === 0 ? <p class="empty">Brak wpisów.</p> : (
+          <ol class="tl-list">
+            {s.items.map((w: any) => {
+              const f = fmt(w, s.month);
+              const eps = episodesOf(w);
+              return (
+                <li class="ev" id={w.id}>
+                  <span class="ev-dot" aria-hidden="true"></span>
+                  <button type="button" class="ev-btn" aria-expanded="false" aria-controls={`p-${w.id}`}>
+                    <span class="ev-date">{f.main} · {f.era}</span>
+                    <span class="ev-title">{w.data.tytul}</span>
+                  </button>
+                  <div class="ev-panel" id={`p-${w.id}`} role="region" aria-label={w.data.tytul}>
+                    {w.data.podtytul && <p class="ev-sub">{w.data.podtytul}</p>}
+                    {paragraphs(w.data.opis).map((p) => <p>{p}</p>)}
+                    {eps.map((e) => <a class="ev-link" href={epUrl(e)}>→ {epLabel(e)}</a>)}
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        )}
+      </section>
+    );
+  })}
+</div>

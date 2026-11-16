@@ -1,0 +1,9 @@
+---
+import WorldPage from '../../../components/WorldPage.astro';
+import Entity from '../../../components/Entity.astro';
+import { loadAll } from '../../../lib/data';
+const { bohaterowie } = await loadAll();
+---
+<WorldPage title="Bohaterowie" current="bohaterowie" icon="users">
+  <div class="cards cards-heroes">{bohaterowie.map((b) => <Entity kind="bohater" entry={b} />)}</div>
+</WorldPage>

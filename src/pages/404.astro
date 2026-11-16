@@ -1,0 +1,11 @@
+---
+import Base from '../layouts/Base.astro';
+import { url } from '../lib/data';
+---
+<Base title="Nie znaleziono">
+  <section class="welcome">
+    <h1>Ta karta kroniki zaginęła</h1>
+    <p class="welcome-intro">Strona, której szukasz, nie istnieje lub została usunięta.</p>
+    <a class="btn" href={url()}>Wróć na stronę główną</a>
+  </section>
+</Base>

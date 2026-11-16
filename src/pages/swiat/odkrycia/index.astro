@@ -1,0 +1,9 @@
+---
+import WorldPage from '../../../components/WorldPage.astro';
+import Entity from '../../../components/Entity.astro';
+import { loadAll } from '../../../lib/data';
+const { odkrycia } = await loadAll();
+---
+<WorldPage title="Odkrycia" current="odkrycia" icon="chest" intro="Przedmioty, dokumenty, symbole i inne znaleziska.">
+  {odkrycia.length ? <div class="cards cards-wide">{odkrycia.map((o) => <Entity kind="odkrycie" entry={o} />)}</div> : <p class="empty">Brak wpisów.</p>}
+</WorldPage>

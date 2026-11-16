@@ -1,0 +1,18 @@
+---
+import WorldPage from '../../components/WorldPage.astro';
+import Icon from '../../components/Icon.astro';
+import swiat from '../../data/swiat.json';
+import { img, imgW } from '../../lib/data';
+const s = swiat as { tytul?: string; mapa?: string; podpis?: string };
+---
+<WorldPage title={s.tytul || 'Mapa znanego świata'} current="swiat" icon="map">
+  {s.mapa ? (
+    <figure class="map">
+      <a href={img(s.mapa)} data-zoom={img(s.mapa)} data-orig={img(s.mapa)} data-caption={s.tytul || 'Mapa znanego świata'}>
+        <img src={imgW(s.mapa, 1600)} data-orig={img(s.mapa)} alt={s.tytul || 'Mapa znanego świata'} />
+        <span class="zoom-hint"><Icon name="zoom" size={18} /> Powiększ mapę</span>
+      </a>
+      {s.podpis && <figcaption>{s.podpis}</figcaption>}
+    </figure>
+  ) : <p class="empty">Mapa nie została jeszcze dodana.</p>}
+</WorldPage>
