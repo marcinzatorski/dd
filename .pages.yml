@@ -136,7 +136,7 @@ content:
     path: src/content/npc
     format: yaml-frontmatter
     view:
-      fields: [imie, status]
+      fields: [imie, tytul]
       primary: imie
       default:
         sort: imie
@@ -233,7 +233,7 @@ content:
     path: src/content/wydarzenia
     format: yaml-frontmatter
     view:
-      fields: [tytul, data, punkt_zerowy]
+      fields: [tytul, data]
       primary: tytul
       default:
         sort: data
