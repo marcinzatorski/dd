@@ -7,8 +7,6 @@ ilustracja: /media/epizody/test-ilustracja.webp
 npc:
   - src/content/npc/npc-003.md
   - src/content/npc/2026-11-16-testowy-krasnolud.md
-miejsca:
-  - src/content/miejsca/miejsce-001.md
 odkrycia:
   - src/content/odkrycia/odk-002.md
 wydarzenia:
